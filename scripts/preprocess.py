@@ -8,9 +8,6 @@ This script performs:
 3. Standardize features using StandardScaler (fit on train only)
 4. Apply SMOTE to training set only (balances classes)
 5. Pickle processed train/test sets for model training
-
-Usage:
-    python scripts/preprocess.py
 """
 
 import os
@@ -52,11 +49,9 @@ def explore_data(df):
     """Display basic information about the dataset."""
     print("\nStep 2: Exploring dataset...")
     
-    # Check for missing values
     missing = df.isnull().sum().sum()
     print(f"✓ Missing values: {missing}")
     
-    # Class distribution
     class_dist = df['Class'].value_counts()
     fraud_pct = (class_dist[1] / len(df)) * 100
     
@@ -68,17 +63,10 @@ def explore_data(df):
 def split_data(df, test_size=0.2):
     """Split data into train and test sets with stratification."""
     print(f"\nStep 3: Splitting data (train: {int((1-test_size)*100)}%, test: {int(test_size*100)}%)...")
-    
-    # # --- ADD THIS PART HERE ---
-    # from sklearn.utils import shuffle
-    # df = shuffle(df, random_state=RANDOM_SEED)
-    # # --------------------------
-    
-    # Separate features and target
+
     X = df.drop('Class', axis=1)
     y = df['Class']
     
-    # Stratified split to preserve class distribution
     X_train, X_test, y_train, y_test = train_test_split(
         X, y,
         test_size=test_size,
@@ -98,14 +86,11 @@ def standardize_features(X_train, X_test):
     """Standardize features using StandardScaler (fit on train only)."""
     print("\nStep 4: Standardizing features...")
     
-    # Initialize scaler
     scaler = StandardScaler()
     
-    # Fit on training data only
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
     
-    # Convert back to DataFrame to preserve column names
     X_train_scaled = pd.DataFrame(
         X_train_scaled,
         columns=X_train.columns,
@@ -128,15 +113,12 @@ def apply_smote(X_train, y_train):
     print("\nStep 5: Applying SMOTE to training set...")
     print(f"  - Before SMOTE: {Counter(y_train)}")
     
-    # Initialize SMOTE
     smote = SMOTE(random_state=RANDOM_SEED, n_jobs=-1)
     
     try:
-        # Apply SMOTE
         X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
         
         print(f"  - After SMOTE: {Counter(y_train_resampled)}")
-        # Create visualization of class balance after SMOTE
         import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots(figsize=(8, 5))
@@ -169,7 +151,6 @@ def create_validation_split(X_train, y_train, val_size=0.2):
     """Create stratified validation split from training data."""
     print(f"\nStep 6: Creating stratified validation split ({int((1-val_size)*100)}% train, {int(val_size*100)}% validation)...")
     
-    # Stratified split to preserve class distribution in both train and validation
     X_train_split, X_val, y_train_split, y_val = train_test_split(
         X_train, y_train,
         test_size=val_size,
@@ -189,10 +170,8 @@ def save_processed_data(X_train, X_val, X_test, y_train, y_val, y_test, scaler):
     """Save processed data to pickle files."""
     print("\nStep 7: Saving processed data...")
     
-    # Create data directory if it doesn't exist
     Path("data").mkdir(parents=True, exist_ok=True)
     
-    # Prepare data dictionaries
     train_data = {
         'X_train': X_train,
         'y_train': y_train
@@ -212,7 +191,6 @@ def save_processed_data(X_train, X_val, X_test, y_train, y_val, y_test, scaler):
         'scaler': scaler
     }
     
-    # Save to pickle files
     try:
         with open('data/train_data.pkl', 'wb') as f:
             pickle.dump(train_data, f)
@@ -230,7 +208,6 @@ def save_processed_data(X_train, X_val, X_test, y_train, y_val, y_test, scaler):
             pickle.dump(scaler_data, f)
         print("✓ Saved: data/scaler.pkl")
         
-        # Calculate and display file sizes
         train_size = os.path.getsize('data/train_data.pkl') / (1024**2)
         val_size = os.path.getsize('data/val_data.pkl') / (1024**2)
         test_size = os.path.getsize('data/test_data.pkl') / (1024**2)
@@ -254,27 +231,20 @@ def main():
     print("=" * 70)
     print()
     
-    # Load data
     df = load_data()
     
-    # Explore data
     explore_data(df)
     
-    # Split data
     X_train, X_test, y_train, y_test = split_data(df, test_size=0.2)
     
-    # Standardize features
     X_train_scaled, X_test_scaled, scaler = standardize_features(X_train, X_test)
     
-    # Apply SMOTE to training set only
     X_train_resampled, y_train_resampled = apply_smote(X_train_scaled, y_train)
     
-    # Create stratified validation split
     X_train_final, X_val, y_train_final, y_val = create_validation_split(
         X_train_resampled, y_train_resampled, val_size=0.2
     )
     
-    # Save processed data
     if save_processed_data(X_train_final, X_val, X_test_scaled, 
                           y_train_final, y_val, y_test, scaler):
         print()
