@@ -1,0 +1,100 @@
+# ------------------------------
+# OS & Editor junk
+# ------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+
+# ------------------------------
+# Python basics
+# ------------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Packaging & build
+*.egg-info/
+*.egg
+build/
+dist/
+.eggs/
+pip-wheel-metadata/
+
+# Caches & tooling
+.cache/
+.pytest_cache/
+.mypy_cache/
+.hypothesis/
+
+# Virtual environments
+.venv/
+venv/
+env/
+.conda/
+.mamba/
+.python-version
+
+# ------------------------------
+# Jupyter
+# ------------------------------
+.ipynb_checkpoints/
+.jupyter/
+
+# ------------------------------
+# Environment & secrets
+# ------------------------------
+.env
+.env.*
+*.env
+*.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+kaggle.json
+.kaggle/
+
+# ------------------------------
+# Data (large files)
+# ------------------------------
+# Ignore all data artifacts by default
+data/**
+# Keep documentation/placeholders
+!data/README.md
+!data/.gitkeep
+
+# ------------------------------
+# Models (artifacts)
+# ------------------------------
+models/**/*.pkl
+models/**/*.joblib
+models/**/*.h5
+models/**/*.hd5
+models/**/*.pt
+models/**/*.pth
+models/**/*.onnx
+models/**/*.sav
+
+# ------------------------------
+# Results & reports
+# ------------------------------
+results/**
+# Keep documentation/placeholders
+!results/README.md
+!results/.gitkeep
+
+# ------------------------------
+# Logs & temporary files
+# ------------------------------
+*.log
+logs/
+tmp/
+temp/
+
+# ------------------------------
+# Misc tool-local configs
+# ------------------------------
+.sagemaker/
