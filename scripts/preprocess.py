@@ -69,6 +69,11 @@ def split_data(df, test_size=0.2):
     """Split data into train and test sets with stratification."""
     print(f"\nStep 3: Splitting data (train: {int((1-test_size)*100)}%, test: {int(test_size*100)}%)...")
     
+    # # --- ADD THIS PART HERE ---
+    # from sklearn.utils import shuffle
+    # df = shuffle(df, random_state=RANDOM_SEED)
+    # # --------------------------
+    
     # Separate features and target
     X = df.drop('Class', axis=1)
     y = df['Class']
@@ -131,6 +136,26 @@ def apply_smote(X_train, y_train):
         X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
         
         print(f"  - After SMOTE: {Counter(y_train_resampled)}")
+        # Create visualization of class balance after SMOTE
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots(figsize=(8, 5))
+        classes = ['Normal (0)', 'Fraud (1)']
+        counts = [Counter(y_train_resampled)[0], Counter(y_train_resampled)[1]]
+        colors = ['#2ecc71', '#e74c3c']
+
+        ax.bar(classes, counts, color=colors, alpha=0.7, edgecolor='black')
+        ax.set_ylabel('Number of Samples', fontsize=12)
+        ax.set_title('Class Distribution After SMOTE', fontsize=14, fontweight='bold')
+        ax.set_ylim(0, max(counts) * 1.1)
+
+        for i, count in enumerate(counts):
+            ax.text(i, count + max(counts)*0.02, f'{count:,}\n(50%)', ha='center', fontsize=11, fontweight='bold')
+
+        plt.tight_layout()
+        plt.savefig('data/smote_balance.png', dpi=300, bbox_inches='tight')
+        plt.close()
+        print(f"  - Visualization saved: data/smote_balance.png")
         print(f"✓ SMOTE applied successfully")
         print(f"  - New training set size: {X_train_resampled.shape[0]:,} samples")
         print(f"  - Balanced classes: 50% fraud, 50% normal")
@@ -140,9 +165,29 @@ def apply_smote(X_train, y_train):
         print(f"✗ Error applying SMOTE: {e}")
         sys.exit(1)
 
-def save_processed_data(X_train, X_test, y_train, y_test, scaler):
+def create_validation_split(X_train, y_train, val_size=0.2):
+    """Create stratified validation split from training data."""
+    print(f"\nStep 6: Creating stratified validation split ({int((1-val_size)*100)}% train, {int(val_size*100)}% validation)...")
+    
+    # Stratified split to preserve class distribution in both train and validation
+    X_train_split, X_val, y_train_split, y_val = train_test_split(
+        X_train, y_train,
+        test_size=val_size,
+        random_state=RANDOM_SEED,
+        stratify=y_train
+    )
+    
+    print(f"✓ Validation split completed")
+    print(f"  - Training samples: {X_train_split.shape[0]:,}")
+    print(f"  - Validation samples: {X_val.shape[0]:,}")
+    print(f"  - Train fraud cases: {y_train_split.sum():,} ({(y_train_split.sum()/len(y_train_split)*100):.3f}%)")
+    print(f"  - Validation fraud cases: {y_val.sum():,} ({(y_val.sum()/len(y_val)*100):.3f}%)")
+    
+    return X_train_split, X_val, y_train_split, y_val
+
+def save_processed_data(X_train, X_val, X_test, y_train, y_val, y_test, scaler):
     """Save processed data to pickle files."""
-    print("\nStep 6: Saving processed data...")
+    print("\nStep 7: Saving processed data...")
     
     # Create data directory if it doesn't exist
     Path("data").mkdir(parents=True, exist_ok=True)
@@ -151,6 +196,11 @@ def save_processed_data(X_train, X_test, y_train, y_test, scaler):
     train_data = {
         'X_train': X_train,
         'y_train': y_train
+    }
+    
+    val_data = {
+        'X_val': X_val,
+        'y_val': y_val
     }
     
     test_data = {
@@ -168,6 +218,10 @@ def save_processed_data(X_train, X_test, y_train, y_test, scaler):
             pickle.dump(train_data, f)
         print("✓ Saved: data/train_data.pkl")
         
+        with open('data/val_data.pkl', 'wb') as f:
+            pickle.dump(val_data, f)
+        print("✓ Saved: data/val_data.pkl")
+        
         with open('data/test_data.pkl', 'wb') as f:
             pickle.dump(test_data, f)
         print("✓ Saved: data/test_data.pkl")
@@ -178,11 +232,13 @@ def save_processed_data(X_train, X_test, y_train, y_test, scaler):
         
         # Calculate and display file sizes
         train_size = os.path.getsize('data/train_data.pkl') / (1024**2)
+        val_size = os.path.getsize('data/val_data.pkl') / (1024**2)
         test_size = os.path.getsize('data/test_data.pkl') / (1024**2)
         scaler_size = os.path.getsize('data/scaler.pkl') / (1024**2)
         
         print(f"\nFile sizes:")
         print(f"  - train_data.pkl: {train_size:.2f} MB")
+        print(f"  - val_data.pkl: {val_size:.2f} MB")
         print(f"  - test_data.pkl: {test_size:.2f} MB")
         print(f"  - scaler.pkl: {scaler_size:.2f} MB")
         
@@ -213,17 +269,23 @@ def main():
     # Apply SMOTE to training set only
     X_train_resampled, y_train_resampled = apply_smote(X_train_scaled, y_train)
     
+    # Create stratified validation split
+    X_train_final, X_val, y_train_final, y_val = create_validation_split(
+        X_train_resampled, y_train_resampled, val_size=0.2
+    )
+    
     # Save processed data
-    if save_processed_data(X_train_resampled, X_test_scaled, 
-                          y_train_resampled, y_test, scaler):
+    if save_processed_data(X_train_final, X_val, X_test_scaled, 
+                          y_train_final, y_val, y_test, scaler):
         print()
         print("=" * 70)
         print("✅ SUCCESS! Data preprocessing completed")
         print("=" * 70)
         print("\nProcessed data summary:")
-        print(f"  - Training samples: {len(X_train_resampled):,} (balanced with SMOTE)")
+        print(f"  - Training samples: {len(X_train_final):,} (balanced with SMOTE)")
+        print(f"  - Validation samples: {len(X_val):,} (balanced with SMOTE, stratified)")
         print(f"  - Test samples: {len(X_test_scaled):,} (original imbalanced distribution)")
-        print(f"  - Features: {X_train_resampled.shape[1]}")
+        print(f"  - Features: {X_train_final.shape[1]}")
         print("\nNext steps:")
         print("1. Run data exploration: jupyter notebook notebooks/data_exploration.ipynb")
         print("2. Train model locally or upload to Google Colab:")
@@ -231,6 +293,7 @@ def main():
         print("   - Colab: Upload notebooks/model_training.ipynb to Google Colab")
         print("\nFiles ready for training:")
         print("  ✓ data/train_data.pkl")
+        print("  ✓ data/val_data.pkl")
         print("  ✓ data/test_data.pkl")
         print("  ✓ data/scaler.pkl")
     else:
