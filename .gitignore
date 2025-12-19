@@ -81,7 +81,7 @@ models/**/*.sav
 # ------------------------------
 # Results & reports
 # ------------------------------
-results/**
+results/*.png
 # Keep documentation/placeholders
 !results/README.md
 !results/.gitkeep

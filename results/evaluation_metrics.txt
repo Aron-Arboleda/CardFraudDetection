@@ -1,0 +1,74 @@
+CREDIT CARD FRAUD DETECTION - MODEL EVALUATION RESULTS
+======================================================================
+
+Model Architecture:
+  - Input Features: 30
+  - Hidden Layer 1: 64 neurons (ReLU + Dropout 0.3)
+  - Hidden Layer 2: 32 neurons (ReLU + Dropout 0.3)
+  - Output Layer: 1 neuron (Sigmoid)
+
+Training Configuration:
+  - Optimizer: Adam (lr=0.001)
+  - Loss: Binary Crossentropy
+  - Epochs: 14
+  - Batch Size: 256
+  - Early Stopping: Patience 5
+
+Dataset:
+  - Training Samples: 454,902 (SMOTE-balanced)
+  - Test Samples: 56,962 (original imbalanced)
+  - Test Fraud Rate: 0.172%
+
+======================================================================
+TEST SET PERFORMANCE METRICS
+======================================================================
+
+Primary Metrics:
+  - Accuracy: 0.9988
+  - Precision: 0.6136
+  - Recall: 0.8265
+  - F1-Score: 0.7043
+  - AUC-ROC: 0.9333
+  - PR-AUC: 0.8137
+
+Confusion Matrix:
+  - True Negatives (TN): 56,813
+  - False Positives (FP): 51
+  - False Negatives (FN): 17
+  - True Positives (TP): 81
+
+======================================================================
+CLASSIFICATION REPORT
+======================================================================
+
+              precision    recall  f1-score   support
+
+      Normal       1.00      1.00      1.00     56864
+       Fraud       0.61      0.83      0.70        98
+
+    accuracy                           1.00     56962
+   macro avg       0.81      0.91      0.85     56962
+weighted avg       1.00      1.00      1.00     56962
+
+
+======================================================================
+INTERPRETATION
+======================================================================
+
+The model demonstrates strong performance in detecting credit card fraud:
+
+1. HIGH AUC-ROC (0.9333): Excellent ability to distinguish between 
+   fraud and normal transactions across all thresholds.
+
+2. PRECISION (0.6136): When the model predicts fraud, it is 
+   correct 61.36% of the time, minimizing false alarms.
+
+3. RECALL (0.8265): The model successfully identifies 
+   82.65% of actual fraud cases.
+
+4. F1-SCORE (0.7043): Good balance between precision and recall.
+
+5. The model successfully handles the severe class imbalance (1:578 ratio)
+   in the original dataset through SMOTE oversampling during training.
+
+Generated on: 2025-12-19 09:59:09

@@ -1,0 +1,39 @@
+CREDIT CARD FRAUD DETECTION - EDA SUMMARY
+======================================================================
+
+Dataset Overview:
+Total transactions: 284,807
+Features: 32
+Normal: 284,315 (99.827%)
+Fraud: 492 (0.173%)
+Imbalance ratio: 1:578
+
+Amount Statistics:
+Normal mean: $88.29
+Fraud mean: $122.21
+
+Top Correlations with Fraud:
+Class     1.000000
+V11       0.154876
+V4        0.133447
+V2        0.091289
+V21       0.040413
+V19       0.034783
+V20       0.020090
+V8        0.019875
+V27       0.017580
+V28       0.009536
+Amount    0.005632
+Name: Class, dtype: float64
+
+V9    -0.097733
+V1    -0.101347
+V18   -0.111485
+V7    -0.187257
+V3    -0.192961
+V16   -0.196539
+V10   -0.216883
+V12   -0.260593
+V14   -0.302544
+V17   -0.326481
+Name: Class, dtype: float64
