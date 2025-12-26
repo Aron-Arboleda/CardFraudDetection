@@ -66,25 +66,25 @@ data/**
 !data/README.md
 !data/.gitkeep
 
-# ------------------------------
-# Models (artifacts)
-# ------------------------------
-models/**/*.pkl
-models/**/*.joblib
-models/**/*.h5
-models/**/*.hd5
-models/**/*.pt
-models/**/*.pth
-models/**/*.onnx
-models/**/*.sav
+# # ------------------------------
+# # Models (artifacts)
+# # ------------------------------
+# models/**/*.pkl
+# models/**/*.joblib
+# models/**/*.h5
+# models/**/*.hd5
+# models/**/*.pt
+# models/**/*.pth
+# models/**/*.onnx
+# models/**/*.sav
 
-# ------------------------------
-# Results & reports
-# ------------------------------
-results/*.png
-# Keep documentation/placeholders
-!results/README.md
-!results/.gitkeep
+# # ------------------------------
+# # Results & reports
+# # ------------------------------
+# results/*.png
+# # Keep documentation/placeholders
+# !results/README.md
+# !results/.gitkeep
 
 # ------------------------------
 # Logs & temporary files

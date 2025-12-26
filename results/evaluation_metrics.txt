@@ -28,7 +28,7 @@ Primary Metrics:
   - Precision: 0.7257
   - Recall: 0.8367
   - F1-Score: 0.7773
-  - AUC-ROC: 0.9284
+  - AUC-ROC: 0.9640
   - PR-AUC: 0.8221
 
 Confusion Matrix:
@@ -57,7 +57,7 @@ INTERPRETATION
 
 The model demonstrates strong performance in detecting credit card fraud:
 
-1. HIGH AUC-ROC (0.9284): Excellent ability to distinguish between
+1. HIGH AUC-ROC (0.9640): Excellent ability to distinguish between
    fraud and normal transactions across all thresholds.
 
 2. PRECISION (0.7257): When the model predicts fraud, it is
